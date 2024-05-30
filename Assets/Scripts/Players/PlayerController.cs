@@ -1,6 +1,7 @@
 ﻿using System;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
@@ -14,13 +15,17 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rb;
 
     [Header("Look")]
-    private bool canLook = true;
     public Transform camContainer;
     public float minXLook;
     public float maxXLook;
     private float camCurXRot;
     public float lookSensitivity;
     private Vector2 mouseDelta;
+
+    [Header("Inventory")]
+    private bool canLook = true;
+    public GameObject crossHair;
+    public Action Inventory;
 
     private void Awake()
     {
@@ -95,5 +100,22 @@ public class PlayerController : MonoBehaviour
             }
         }
         return false;
+    }
+
+    public void OnInventory(InputAction.CallbackContext context)
+    {
+        if(context.phase == InputActionPhase.Started)
+        {
+            Inventory?.Invoke();
+            ToggleCursor();
+        }
+    }
+
+    private void ToggleCursor()
+    {
+        bool toggle = Cursor.lockState == CursorLockMode.Locked;
+        Cursor.lockState = toggle?CursorLockMode.None:CursorLockMode.Locked;
+        crossHair.SetActive(!crossHair.activeSelf);
+        canLook = !toggle;
     }
 }
